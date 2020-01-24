@@ -37,7 +37,7 @@ int main()
 	while(cur_case!=5) 
 	{
 		cout << endl <<
-				"Main Menu " <<size<<counter<< "\n\n" <<
+				"Main Menu – Size:" <<size<< " Count: "<<counter<< "\n\n" <<
 				"1. Print the Array \n" <<
 				"2. Append element at the end \n" <<
 				"3. Remove last element \n" <<
@@ -137,10 +137,12 @@ Points v to new memory space
 */
 void Grow()
 {
+	//cout <<"Previous capacity: "<<size<<" element \n";
 	double *nv=new double[++size];
 	for(int i=0;i<size-1;i++) nv[i]=v[i];
 	delete[] v;
 	v=nv;
+	//cout <<"New capacity: "<<size<<" element \n";
 }
 
 /*  Same as Grow() but decreases vector to half its original size  */
@@ -175,7 +177,6 @@ void AddElement()
 	if (counter==size) Grow();
 	v[counter]=isInt("Enter the new element: ");
 	counter++;
-	PrintVector();
 }
 
 
@@ -187,7 +188,6 @@ void AddElement(int elIndex)
 	if (counter==size) Grow();
 	v[elIndex]=isInt("Enter the new element: ");
 	counter++;
-	PrintVector();
 }
 
 
@@ -199,8 +199,7 @@ void RemoveElement()
 {
 	if (counter==0) cout << "This array is already empty \n";
 	else  DropEnd();
-	//+1 to avoid dealing with 0s
-	while (.3*size>counter) Shrink();
+	//while (.3*size>counter) Shrink();
 
 }
 
