@@ -2,6 +2,12 @@
 #include <string>
 using namespace std;
 
+//Jack Fenton and Michael Delaney
+//Northeastern University
+//EECE2150 Embedded Design
+//Lab 2
+//30 January 2020
+
 // Linked List Management Code
 struct Person
 {
@@ -48,14 +54,11 @@ string inString(string prompt);
 
 
 
-/** main function: Will create and process a linked list
- */
+/* main function: Will create and process a linked list */
 int main() {
 	List list;				// Create the main list
-	ListInitialize(&list);			// Initialize the list
-//*************** PUT THE REST OF YOUR CODE HERE  *****************
+	ListInitialize(&list);	// Initialize the list
 	int cur_case;
-
 	while(cur_case!=5) 
 	{
 		cout << endl <<
@@ -101,14 +104,9 @@ int main() {
 			case 5:
 			//exit
 				cout << "Exit \n\n";
-
 		}
 	}
-
-
 	return 0;
-
-
 } 
 //end main
 
@@ -218,50 +216,54 @@ int inInt(string prompt)
 	return inputInt;
 }
 
+/*  Prints a prompt and takes input, returns input as a string */
 string inString(string prompt)
 {
 	string inputStr;
-
 	cout << prompt;	
 	cin >> inputStr;
-
 	return inputStr;
 }
 
 
-
+/* 
+Creates new newGuy, an empty struct with atributes of person
+Assigns id, assigns name and age based on user input
+From wherever the current position was, moves forward until position is one after last defined person
+Assigns last previously defined person to point to newGuy
+*/
 void AddPerson(List *list)
 {
 	Person *newGuy;
 	newGuy= new Person;
-
 	
 	newGuy->id=list->count+1;
 	newGuy->name=inString("Person's Name: ");
-
 	newGuy->age=inInt("Person's Age: ");
 	cout << endl;
 
 	while (list->current!=NULL) ListNext(list);
-	ListInsert(list, newGuy);
-	
+	ListInsert(list, newGuy);	
 	list->count++;
 
-	PrintList(list);
 
 }
-
+/* New printing function that prints all data for one person on single line */
 void PrintList(List *list)
 {
 	ListHead(list);
-	for (int i=0;i<list->count;i++)  
+	while(list->current!=NULL)
 	{
 	cout << "id: "<< list->current->id << " Name: " << list->current->name << "  Age: " <<list->current->age << endl; 
 	ListNext(list);
 	}
 }
 
-
+/* 
+User declares id of person they want information for 
+ListFind() iterates through until current id is the one requested
+PrintPerson() outputs information about person
+*/
 void FindPerson(List *list)
 {
 	int findID;
@@ -276,7 +278,11 @@ void FindPerson(List *list)
 	PrintPerson(list->current);
 
 }
-
+/* 
+Same way as FindPerson(), sets current position to the user input
+Use predefined function to remove specified person  
+Reassigns previous element to point to one that follows
+*/
 void RemovePerson(List *list)
 {
 	int findID;
@@ -290,7 +296,6 @@ void RemovePerson(List *list)
 	ListFind(list, findID);
 	ListRemove(list);
 
-	list->count--;
 }
 
 
