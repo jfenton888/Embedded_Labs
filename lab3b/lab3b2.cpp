@@ -10,12 +10,12 @@
 //Northeastern University
 //EECE2150 Embedded Design
 //Lab 3b Object Oriented
-//30 January 2020
+//6 February 2020
 
 
 using namespace std;
 
-/*  Initialize Global Variables  */
+/* ***** Initialize Global Variables ***** */
 
 // Physical base address of GPIO
 const unsigned gpio_address = 0x400d0000; 
@@ -47,189 +47,128 @@ const int gpio_pbtnd_offset = 0x178; // Offset for down push button
 const int gpio_pbtnc_offset = 0x17C; // Offset for center push button
 */
 
-class ZedBoard()
+/* ***** Class Definitions ***** */
+
+class ZedBoard
 {
 private:
 	static int fd;
 	static char *pBase;
 
-protected:
-
-
 public:
-
 	ZedBoard();
 	~ZedBoard();
 
 	void RegisterWrite(int offset, int value);
 	int RegisterRead(int offset);
 
-};
+}; //Methods for ZedBoard on lines 000-000
 
-/*
-   Initialize general-purpose I/O
- * - Opens access to physical memory /dev/mem
- * - Maps memory at offset 'gpio_address' into virtual address space
- *
- * @param fd File descriptor passed by reference, where the result
- * of function 'open' will be stored.
- * @return Address to virtual memory which is mapped to physical,
- * or MAP_FAILED on error.
- */
-ZedBoard::ZedBoard()
+
+class LEDs : public virtual ZedBoard
 {
-	fd = open( "/dev/mem", O_RDWR);
-	*pBase = (char *) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-			*fd, gpio_address);
 
-	if (pBase == MAP_FAILED)
-	{
-		cerr << "Mapping I/O memory failed - Did you run with 'sudo'?\n";
-		exit(1); // Returns 1 to the operating system;
-	}
-}
+private:
+	static int LED_base;
 
-/*
- * Close general-purpose I/O.
- *
- * @param pBase Virtual address where I/O was mapped.
- * @param fd File descriptor previously returned by 'open'.
- */
-~ZedBoard::ZedBoard()
+public:
+	LEDs(){LED_base = 0x12C;}
+	~LEDs(){}
+
+	void Write1Led(int ledNum, int state);
+	void WriteAllLeds(int numLEDs);
+
+	int Read1Led(int ledNum);
+	int ReadAllLeds();
+
+	void Display1Led();
+	void DisplayAllLeds();
+
+	friend class Switches;
+	friend class Buttons;
+}; //Methods for LEDs on lines 000-000
+
+class Switches : public virtual ZedBoard
 {
-	munmap(pBase, gpio_size);
-	close(fd);
-}
+
+private:
+	static int Switch_base;
+
+public:
+	Switches(){Switch_base = 0x14C;}
+	~Switches(){}
+
+	int Read1Switch(int switchNum);
+	int ReadAllSwitches();
+
+	void Output1Switch();
+	void OutputAllSwitches();
+
+	friend class LEDs;
+	friend class Buttons;
+}; //Methods for Switches on lines 000-000
 
 
-/*
- * Write a 4-byte value at the specified general-purpose I/O location.
- * 
- * @param pBase Base address returned by 'mmap'.
- * @parem offset Offset where device is mapped.
- * @param value Value to be written.
- */ 
-void ZedBoard::RegisterWrite(int offset, int value)
+class Buttons : public virtual ZedBoard
 {
-	* (int *) (pBase + offset) = value;
-} 
+
+private:
+	static int Button_base;
+	int cur_butt;
+	int last_butt;
+	int count;
+
+public:
+	Buttons(){Button_base = 0x16C, cur_butt=0, last_butt=0, count=0;}
+	~Buttons(){}
+
+	int Read1Butt(int buttNum);
+	void PushButtonGet();
+	void ButtonCommands();
+	void ButtonSelection();
+
+	friend class LEDs;
+	friend class Switches;
+}; //Methods for Buttons on lines 000-000
 
 
-/*
- * Read a 4-byte value from the specified general-purpose I/O location.
- * 
- * @param pBase Base address returned by 'mmap'.
- * @param offset Offset where device is mapped.
- * @return Value read.
- */
-int ZedBoard::RegisterRead(int offset)
+class ZedMenu : private LEDs, private Switches, private Buttons
 {
-	return * (int *) (pBase + offset);
-}
+private:
+	int cur_case;
+public:
+	ZedMenu(){cur_case=0;}
+	~ZedMenu(){}
+
+	int Current(){return cur_case;}
+	void PromptSelection();
+	void ChooseOption();
+	void Selection();
+
+}; //Methods for ZedMenu on lines 000-000
 
 
+/*  ***** Initialize Non-Class Functions ***** */
+int isInt (int min, int max, string prompt);
 
 
-
-/*  Initialize Functions  */
-/*
-char *Initialize(int *fd);
-void Finalize(char *pBase, int fd);
-
-void Write1Led(char *pBase, int ledNum, int state);
-int Read1Led(char *pBase, int ledNum);
-void WriteAllLeds(char *pBase, int numLEDs);
-int ReadAllLeds(char *pBase);
-
-int Read1Switch(char *pBase, int switchNum);
-int ReadAllSwitches(char *pBase);
-
-void ButtonCommands(char *pBase);
-int PushButtonGet(char *pBase);
-*/
-
-int isInt (string prompt, int min, int max);
-
-
+/* ***** MAIN FUNCTION FOR PROGRAM ***** */
 int main()
 {
+	ZedMenu myZedMenu;
 	
-	int cur_case;
-	int numIn, stateIn, stateOut,numOut;
-
-
-	
-
-	while(cur_case!=6) 
-
+	myZedMenu.ChooseOption();
+	while(myZedMenu.Current()!=6) 
 	{
-		cout << endl <<
-			"Main Menu \n\n" <<
-			"1. Change an LED \n" <<
-			"2. Read a Switch State \n" <<
-			"3. Show a Number on LEDs \n" <<
-			"4. Display Number on Switches \n" << 
-			"5. Button Pressing Bonanza \n" <<
-			"6. Exit \n\n" <<
-			"Select and option: ";
-		cin >> cur_case;
-		if (cin.fail()) 
-		{
-			cin.clear(); 
-			cin.ignore();
-		} 
-		switch(cur_case)
-		{
-			case 1:
-				//Change LED
-
-
-				numIn=isInt("Choose an LED to set: ",0,7);
-				stateIn=isInt("Choose state for the LED: ",0,1);
-				Write1Led(pBase, numIn, stateIn);
-
-				break;
-
-			case 2:
-				//Read Switch
-
-
-
-				numIn=isInt("Choose a Switch to read: ",0,7);
-				stateOut=Read1Switch(pBase, numIn);
-				cout<<"The state of Switch "<<numIn<<" is "<<stateOut<<endl;
-
-				break;
-
-			case 3:
-
-				numIn=isInt("Choose number to display on LEDS: ",0,255);
-				WriteAllLeds(pBase, numIn);
-
-				break;
-
-			case 4:
-
-
-				numOut=ReadAllSwitches(pBase);
-				cout<<"The 8 bit number made by the switches is "<<numOut<<endl;
-
-
-				break;
-			case 5:
-				ButtonCommands(pBase);
-				break;
-
-			case 6:
-				//exit
-				cout << "Exit \n\n";
-
-		}
+		myZedMenu.Selection();
+		myZedMenu.ChooseOption();
 	}
 }
 
+
+
 /*  Prints a prompt and takes input, returns input when it is int between min and max */
-int isInt(string prompt, int min, int max)
+int isInt(int min, int max, string prompt=" ")
 {
 	int input=-1;
 	while((input<min) || (input>max))
@@ -248,22 +187,67 @@ int isInt(string prompt, int min, int max)
 
 
 
-class LEDs : public ZedBoard
+
+/*
+   Initialize general-purpose I/O
+ * - Opens access to physical memory /dev/mem
+ * - Maps memory at offset 'gpio_address' into virtual address space
+ *
+ * @param fd File descriptor passed by reference, where the result
+ * of function 'open' will be stored.
+ * @return Address to virtual memory which is mapped to physical,
+ * or MAP_FAILED on error.
+ */
+ZedBoard::ZedBoard()
 {
-private:
-	static int LED_base = 0x12C;
+	fd = open( "/dev/mem", O_RDWR);
+	*pBase = (char *) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+			fd, gpio_address);
+
+	if (pBase == MAP_FAILED)
+	{
+		cerr << "Mapping I/O memory failed - Did you run with 'sudo'?\n";
+		exit(1); // Returns 1 to the operating system;
+	}
+}
+
+/*
+ * Close general-purpose I/O.
+ *
+ * @param pBase Virtual address where I/O was mapped.
+ * @param fd File descriptor previously returned by 'open'.
+ */
+ZedBoard::~ZedBoard()
+{
+	munmap(pBase, gpio_size);
+	close(fd);
+}
+
+/*
+ * Write a 4-byte value at the specified general-purpose I/O location.
+ * 
+ * @param pBase Base address returned by 'mmap'.
+ * @parem offset Offset where device is mapped.
+ * @param value Value to be written.
+ */ 
+void ZedBoard::RegisterWrite(int offset, int value)
+{
+	* (int *) (pBase + offset) = value;
+} 
+
+/*
+ * Read a 4-byte value from the specified general-purpose I/O location.
+ * 
+ * @param pBase Base address returned by 'mmap'.
+ * @param offset Offset where device is mapped.
+ * @return Value read.
+ */
+int ZedBoard::RegisterRead(int offset)
+{
+	return * (int *) (pBase + offset);
+}
 
 
-public:
-	LEDs(){}
-	~LEDs(){}
-
-	void Write1Led(int ledNum, int state);
-	void WriteAllLeds(int numLEDs);
-
-	int Read1Led(int ledNum);
-	int ReadAllLeds();
-};
 
 
 /* Changes the state of an LED (ON or OFF)
@@ -306,23 +290,24 @@ int LEDs::ReadAllLeds()
 	return tempInt; 
 }
 
-
-
-class Switches : public ZedBoard
+void LEDs::Display1Led()
 {
-private:
-	static int Switch_base = 0x14C;
+	int numIn, stateIn;
+	numIn=isInt(0,7,"Choose an LED to set: ");
+	stateIn=isInt(0,1,"Choose state for the LED: ");
+	Write1Led(numIn, stateIn);
+}
 
-protected:
+void LEDs::DisplayAllLeds()
+{
+	int numIn;
+	numIn=isInt(0,255,"Choose number to display on LEDs: ");
+	WriteAllLeds(numIn);
+}
 
-public:
-	Switches(){}
-	~Switches(){}
 
 
-	int Read1Switch(int switchNum);
-	int ReadAllSwitches();
-};
+
 
 
 
@@ -337,7 +322,6 @@ int Switches::Read1Switch(int switchNum)
 	return RegisterRead(switchNum_offset);
 }
 
-
 int Switches::ReadAllSwitches()
 {
 	int tempInt=0;
@@ -348,24 +332,21 @@ int Switches::ReadAllSwitches()
 	return tempInt;
 }
 
-
-
-class Buttons : public ZedBoard
+void Switches::Output1Switch()
 {
-private:
-	static int Button_base = 0x16C;
+	int numIn, stateOut;
+	numIn=isInt(0,7,"Choose a Switch to read: ");
+	stateOut=Read1Switch(numIn);
+	cout<<"The state of Switch "<<numIn<<" is "<<stateOut<<endl;
+}
 
-protected:
+void Switches::OutputAllSwitches()
+{
+	cout<<"The 8 bit number made by the switches is "<<ReadAllSwitches()<<endl;
+}
 
-public:
-	Buttons(){}
-	~Buttons(){}
 
 
-	int Read1Butt(int buttNum);
-	int PushButtonGet();
-	void ButtonCommands();
-};
 
 
 
@@ -377,71 +358,119 @@ int Buttons::Read1Butt(int buttNum)
 
 
 void Buttons::ButtonCommands()
-{
-	int cur_butt=0,last_butt=0,count=0;	
+{	
 
 	count=ReadAllSwitches();
 	WriteAllLeds(count);
 	while(true)
 	{	
 		//Getting Current Button		
-		cur_butt=PushButtonGet();		
+		PushButtonGet();		
 		usleep(100000);
 		if (cur_butt!=last_butt)
 		{
-			switch(cur_butt)
-			{
-				case 1:
-					//Shift Digits Right
-					count*=2;
-					WriteAllLeds(count);
-					break;
-
-				case 2:
-					//Shift Digits Left
-					count/=2;
-					WriteAllLeds(count);
-					break;
-
-				case 3:
-					//Incriment LEDS +1
-					count++;
-					WriteAllLeds(count);
-					ReadAllLeds();
-					break;
-
-				case 4:
-					//Incriment LEDS -1
-					count--;
-					WriteAllLeds(count);
-					break;
-
-				case 5:
-
-					//Set LEDs to Switches Num
-					WriteAllLeds(ReadAllSwitches());
-					break;
-				case 6:
-					//exit
-					return;
-			}
+			ButtonSelection();
 		}	
 		last_butt=cur_butt;
-
 	}
 }
 
-int Buttons::PushButtonGet()
+void Buttons::PushButtonGet()
 {
-	int numPress=0;
+	int numPress;
 	for(int i=0; i<5;i++)
 	{	
 		numPress+=(i+1)*Read1Butt(i);
 	}
-	return numPress;
+	cur_butt=numPress;
+}
+
+void Buttons::ButtonSelection()
+{
+	switch(cur_butt)
+	{
+		case 1: //Shift Digits Right					
+			count*=2;
+			WriteAllLeds(count);
+			break;
+
+		case 2: //Shift Digits Left					
+			count/=2;
+			WriteAllLeds(count);
+			break;
+
+		case 3: //Incriment LEDS +1		
+			count++;
+			WriteAllLeds(count);
+			ReadAllLeds();
+			break;
+
+		case 4: //Incriment LEDS -1
+			count--;
+			WriteAllLeds(count);
+			break;
+
+		case 5: //Set LEDs to Switches Num	
+			WriteAllLeds(ReadAllSwitches());
+			break;
+
+		case 6:
+			//exit
+			return;
+	}
 }
 
 
+void ZedMenu::PromptSelection()
+{
+	cout << endl <<
+			"Main Menu \n\n" <<
+			"1. Change an LED \n" <<
+			"2. Read a Switch State \n" <<
+			"3. Show a Number on LEDs \n" <<
+			"4. Display Number on Switches \n" << 
+			"5. Button Pressing Bonanza \n" <<
+			"6. Exit \n\n";
+}
 
+void ZedMenu::ChooseOption()
+{
+		PromptSelection();
+		cur_case=isInt(1,6, "Select an option: ");
+}
+
+void ZedMenu::Selection()
+{
+	switch(cur_case)
+	{
+		case 1:
+			//Change one LED		
+			Display1Led();
+			break;
+
+		case 2:
+			//Read Switch
+			Output1Switch();
+			break;
+
+		case 3:
+			DisplayAllLeds();
+			break;
+
+		case 4:
+			OutputAllSwitches();
+			break;
+
+		case 5:
+			//Push Button Control
+			ButtonCommands();
+			break;
+
+		case 6:
+			//exit
+			cout << "Exit \n\n";
+			break;
+	}
+}
 
 
