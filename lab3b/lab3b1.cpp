@@ -9,7 +9,7 @@
 //Jack Fenton
 //Northeastern University
 //EECE2150 Embedded Design
-//Lab 3
+//Lab 3b Functional
 //30 January 2020
 
 
@@ -47,21 +47,23 @@ const int gpio_pbtnc_offset = 0x17C; // Offset for center push button
 
 
 
+
 /*  Initialize Functions  */
 char *Initialize(int *fd);
 void Finalize(char *pBase, int fd);
-void RegisterWrite(char *pBase, int offset, int value);
-int RegisterRead(char *pBase, int offset);
+
 void Write1Led(char *pBase, int ledNum, int state);
 int Read1Led(char *pBase, int ledNum);
-void Write1Switch(char *pBase, int switchNum, int state);
-int Read1Switch(char *pBase, int switchNum);
 void WriteAllLeds(char *pBase, int numLEDs);
-int isInt (string prompt, int min, int max);
-int ReadAllSwitchs(char *pBase);
 int ReadAllLeds(char *pBase);
+
+int Read1Switch(char *pBase, int switchNum);
+int ReadAllSwitches(char *pBase);
+
 void ButtonCommands(char *pBase);
 int PushButtonGet(char *pBase);
+
+int isInt (string prompt, int min, int max);
 
 
 

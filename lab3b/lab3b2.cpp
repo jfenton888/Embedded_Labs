@@ -84,8 +84,6 @@ public:
 	void Display1Led();
 	void DisplayAllLeds();
 
-	friend class Switches;
-	friend class Buttons;
 }; //Methods for LEDs on lines 000-000
 
 class Switches : public virtual ZedBoard
@@ -104,14 +102,11 @@ public:
 	void Output1Switch();
 	void OutputAllSwitches();
 
-	friend class LEDs;
-	friend class Buttons;
 }; //Methods for Switches on lines 000-000
 
 
-class Buttons : public virtual ZedBoard
+class Buttons : public virtual ZedBoard, public virtual LEDs, public virtual Switches
 {
-
 private:
 	static int Button_base;
 	int cur_butt;
@@ -127,12 +122,10 @@ public:
 	void ButtonCommands();
 	void ButtonSelection();
 
-	friend class LEDs;
-	friend class Switches;
 }; //Methods for Buttons on lines 000-000
 
 
-class ZedMenu : private LEDs, private Switches, private Buttons
+class ZedMenu : private virtual LEDs, private virtual Switches, private Buttons
 {
 private:
 	int cur_case;
@@ -201,7 +194,7 @@ int isInt(int min, int max, string prompt=" ")
 ZedBoard::ZedBoard()
 {
 	fd = open( "/dev/mem", O_RDWR);
-	*pBase = (char *) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+	*pBase = (char*) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
 			fd, gpio_address);
 
 	if (pBase == MAP_FAILED)

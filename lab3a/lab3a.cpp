@@ -9,7 +9,7 @@
 //Jack Fenton
 //Northeastern University
 //EECE2150 Embedded Design
-//Lab 3
+//Lab 3a
 //6 February 2020
 
 
