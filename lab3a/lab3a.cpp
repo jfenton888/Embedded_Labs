@@ -10,7 +10,7 @@
 //Northeastern University
 //EECE2150 Embedded Design
 //Lab 3
-//30 January 2020
+//6 February 2020
 
 
 using namespace std;
@@ -23,22 +23,22 @@ const unsigned gpio_address = 0x400d0000;
 // Length of memory-mapped IO window
 const unsigned gpio_size = 0xff;
 
-const int gpio_led1_offset = 0x12C; // Offset for LED1
-const int gpio_led2_offset = 0x130; // Offset for LED2
-const int gpio_led3_offset = 0x134; // Offset for LED3
-const int gpio_led4_offset = 0x138; // Offset for LED4
-const int gpio_led5_offset = 0x13C; // Offset for LED5
-const int gpio_led6_offset = 0x140; // Offset for LED6
-const int gpio_led7_offset = 0x144; // Offset for LED7
-const int gpio_led8_offset = 0x148; // Offset for LED8
-const int gpio_sw1_offset = 0x14C; // Offset for Switch 1
-const int gpio_sw2_offset = 0x150; // Offset for Switch 2
-const int gpio_sw3_offset = 0x154; // Offset for Switch 3
-const int gpio_sw4_offset = 0x158; // Offset for Switch 4
-const int gpio_sw5_offset = 0x15C; // Offset for Switch 5
-const int gpio_sw6_offset = 0x160; // Offset for Switch 6
-const int gpio_sw7_offset = 0x164; // Offset for Switch 7
-const int gpio_sw8_offset = 0x168; // Offset for Switch 8
+const int gpio_led1_offset  = 0x12C; // Offset for LED1
+const int gpio_led2_offset  = 0x130; // Offset for LED2
+const int gpio_led3_offset  = 0x134; // Offset for LED3
+const int gpio_led4_offset  = 0x138; // Offset for LED4
+const int gpio_led5_offset  = 0x13C; // Offset for LED5
+const int gpio_led6_offset  = 0x140; // Offset for LED6
+const int gpio_led7_offset  = 0x144; // Offset for LED7
+const int gpio_led8_offset  = 0x148; // Offset for LED8
+const int gpio_sw1_offset   = 0x14C; // Offset for Switch 1
+const int gpio_sw2_offset   = 0x150; // Offset for Switch 2
+const int gpio_sw3_offset   = 0x154; // Offset for Switch 3
+const int gpio_sw4_offset   = 0x158; // Offset for Switch 4
+const int gpio_sw5_offset   = 0x15C; // Offset for Switch 5
+const int gpio_sw6_offset   = 0x160; // Offset for Switch 6
+const int gpio_sw7_offset   = 0x164; // Offset for Switch 7
+const int gpio_sw8_offset   = 0x168; // Offset for Switch 8
 const int gpio_pbtnl_offset = 0x16C; // Offset for left push button
 const int gpio_pbtnr_offset = 0x170; // Offset for right push button
 const int gpio_pbtnu_offset = 0x174; // Offset for up push button
@@ -239,6 +239,7 @@ int Read1Switch(char *pBase, int switchNum)
 }
 
 
+/* Each LED is turned on if the number is not divisible by 2^n, using the 7th as 2^0 */
 void WriteAllLeds(char *pBase, int numLEDs)
 {
 	for (int i=7;i>=0;i--) 
@@ -246,10 +247,9 @@ void WriteAllLeds(char *pBase, int numLEDs)
 		Write1Led(pBase, i, numLEDs%2);
 		numLEDs/=2;
 	}
-
 }
 
-
+/* Runs though the 8 switches and adds each coresponding power of 2 when the switch is on */
 int ReadAllSwitchs(char *pBase)
 {
 	int tempInt=0;
