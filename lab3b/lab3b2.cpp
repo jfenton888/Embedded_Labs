@@ -5,6 +5,7 @@
 #include <sys/mman.h> 
 #include <string>
 #include <math.h>
+#include <ctime>
 
 //Jack Fenton
 //Northeastern University
@@ -112,15 +113,22 @@ private:
 	int cur_butt;
 	int last_butt;
 	int count;
+	int countRate;
+	int countDirection;
+	clock_t time_pass;
 
 public:
-	Buttons(){Button_base = 0x16C, cur_butt=0, last_butt=0, count=0;}
+	Buttons(){Button_base = 0x16C, cur_butt=0, last_butt=0, count=0; countRate=0; countDirection=1;}
 	~Buttons(){}
 
 	int Read1Butt(int buttNum);
 	void PushButtonGet();
 	void ButtonCommands();
 	void ButtonSelection();
+	void Counter();
+	void CounterSpeed();
+	void CounterChange();
+	
 
 }; //Methods for Buttons on lines 000-000
 
@@ -129,6 +137,7 @@ class ZedMenu : private virtual LEDs, private virtual Switches, private Buttons
 {
 private:
 	int cur_case;
+
 public:
 	ZedMenu(){cur_case=0;}
 	~ZedMenu(){}
@@ -137,6 +146,7 @@ public:
 	void PromptSelection();
 	void ChooseOption();
 	void Selection();
+	
 
 }; //Methods for ZedMenu on lines 000-000
 
@@ -194,7 +204,7 @@ int isInt(int min, int max, string prompt=" ")
 ZedBoard::ZedBoard()
 {
 	fd = open( "/dev/mem", O_RDWR);
-	*pBase = (char*) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+	*pBase = /*(char*)*/ mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
 			fd, gpio_address);
 
 	if (pBase == MAP_FAILED)
@@ -382,28 +392,94 @@ void Buttons::ButtonSelection()
 {
 	switch(cur_butt)
 	{
-		case 1: //Shift Digits Right					
+		case 1: //Right Button--Shift Digits Right					
 			count*=2;
 			WriteAllLeds(count);
 			break;
 
-		case 2: //Shift Digits Left					
+		case 2: //Left Button--Shift Digits Left					
 			count/=2;
 			WriteAllLeds(count);
 			break;
 
-		case 3: //Incriment LEDS +1		
+		case 3: //Up Button--Incriment LEDS +1		
 			count++;
 			WriteAllLeds(count);
 			ReadAllLeds();
 			break;
 
-		case 4: //Incriment LEDS -1
+		case 4: //Down Button--Incriment LEDS -1
 			count--;
 			WriteAllLeds(count);
 			break;
 
-		case 5: //Set LEDs to Switches Num	
+		case 5: //Center Button--Set LEDs to Switches Num	
+			WriteAllLeds(ReadAllSwitches());
+			break;
+
+		case 6:
+			//exit
+			return;
+	}
+}
+
+
+void Buttons::Counter()
+{
+	time_pass = clock();
+	count=ReadAllSwitches();
+	WriteAllLeds(count);
+	
+	while(true)
+	{	
+		//Getting Current Button		
+		PushButtonGet();		
+		usleep(100000);
+		if (cur_butt!=last_butt)
+		{
+			CounterSpeed();
+		}	
+		last_butt=cur_butt;
+
+		CounterChange();
+	}
+}
+
+void Buttons::CounterChange()
+{
+	if (countRate!=0)
+		{
+			if((clock()-time_pass)/CLOCKS_PER_SEC>1/countRate)
+			{ 
+				count+=countDirection;
+				time_pass=clock();
+			}
+		}
+
+}
+
+
+void Buttons::CounterSpeed()
+{
+	switch(cur_butt)
+	{
+		case 1: //Right Button--Counts Up					
+			countDirection=1;
+			break;
+
+		case 2: //Left Button--Count Down					
+			countDirection=-1;
+			break;
+
+		case 3: //Up Button--Increase Count Speed	
+			countRate++;
+			break;
+
+		case 4: //Down Button--Incriment LEDS -1
+			if (countRate>0) countRate--;
+			break;
+
+		case 5: //Center Button--Set LEDs to Switches Num	
 			WriteAllLeds(ReadAllSwitches());
 			break;
 
@@ -423,7 +499,8 @@ void ZedMenu::PromptSelection()
 			"3. Show a Number on LEDs \n" <<
 			"4. Display Number on Switches \n" << 
 			"5. Button Pressing Bonanza \n" <<
-			"6. Exit \n\n";
+			"6. Counter Speed Control \n" <<
+			"7. Exit \n\n";
 }
 
 void ZedMenu::ChooseOption()
@@ -458,7 +535,8 @@ void ZedMenu::Selection()
 			//Push Button Control
 			ButtonCommands();
 			break;
-
+		case 7:
+			CounterSpeed();
 		case 6:
 			//exit
 			cout << "Exit \n\n";
