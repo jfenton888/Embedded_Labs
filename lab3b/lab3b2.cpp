@@ -438,10 +438,10 @@ void Buttons::Counter()
 		if (cur_butt!=last_butt)
 		{
 			CounterSpeed();
+			CounterChange();
 		}	
 		last_butt=cur_butt;
-
-		CounterChange();
+		
 	}
 }
 
@@ -454,6 +454,7 @@ void Buttons::CounterChange()
 				count+=countDirection;
 				time_pass=clock();
 			}
+			WriteAllLeds(count);
 		}
 
 }
@@ -480,7 +481,7 @@ void Buttons::CounterSpeed()
 			break;
 
 		case 5: //Center Button--Set LEDs to Switches Num	
-			WriteAllLeds(ReadAllSwitches());
+			count=ReadAllSwitches();
 			break;
 
 		case 6:
@@ -506,7 +507,7 @@ void ZedMenu::PromptSelection()
 void ZedMenu::ChooseOption()
 {
 		PromptSelection();
-		cur_case=isInt(1,6, "Select an option: ");
+		cur_case=isInt(1,7, "Select an option: ");
 }
 
 void ZedMenu::Selection()
