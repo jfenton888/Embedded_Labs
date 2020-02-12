@@ -71,7 +71,33 @@ int main()
 {
 	// Initialize
 	int fd;
-	char *pBase = Initialize(&fd);
+	char *pBase;
+//	pBase=Initialize(&fd);
+	
+/*
+char *Initialize(int *fd)
+{
+	*fd = open( "/dev/mem", O_RDWR);
+	return (char *) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+			*fd, gpio_address);
+} 
+
+
+	int fd;
+	char *pBase;
+*/
+	fd = open( "/dev/mem", O_RDWR);
+	pBase = (char *)  mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+			fd, gpio_address);
+	
+
+
+
+
+
+
+
+
 	int cur_case;
 	int numIn, stateIn, stateOut,numOut;
 
@@ -129,7 +155,7 @@ int main()
 			case 4:
 
 
-				numOut=ReadAllSwitchs(pBase);
+				numOut=ReadAllSwitches(pBase);
 				cout<<"The 8 bit number made by the switches is "<<numOut<<endl;
 
 
@@ -261,7 +287,7 @@ void WriteAllLeds(char *pBase, int numLEDs)
 }
 
 
-int ReadAllSwitchs(char *pBase)
+int ReadAllSwitches(char *pBase)
 {
 	int tempInt=0;
 	for (int i=0;i<=7;i++)
@@ -314,8 +340,8 @@ void ButtonCommands(char *pBase)
 {
 	int cur_butt=0,last_butt=0,count=0;	
 
-	WriteAllLeds(pBase,ReadAllSwitchs(pBase));
-	count=ReadAllSwitchs(pBase);
+	WriteAllLeds(pBase,ReadAllSwitches(pBase));
+	count=ReadAllSwitches(pBase);
 	while(true)
 	{	
 		//Getting Current Button		
@@ -353,7 +379,7 @@ void ButtonCommands(char *pBase)
 				case 5:
 
 					//Set LEDs to Switches Num
-					WriteAllLeds(pBase,ReadAllSwitchs(pBase));
+					WriteAllLeds(pBase,ReadAllSwitches(pBase));
 					break;
 				case 6:
 					//exit

@@ -53,8 +53,8 @@ const int gpio_pbtnc_offset = 0x17C; // Offset for center push button
 class ZedBoard
 {
 private:
-	static int fd;
-	static char *pBase;
+	int fd;
+	char *pBase;
 
 public:
 	ZedBoard();
@@ -70,7 +70,7 @@ class LEDs : public virtual ZedBoard
 {
 
 private:
-	static int LED_base;
+	int LED_base;
 
 public:
 	LEDs(){LED_base = 0x12C;}
@@ -91,7 +91,7 @@ class Switches : public virtual ZedBoard
 {
 
 private:
-	static int Switch_base;
+	int Switch_base;
 
 public:
 	Switches(){Switch_base = 0x14C;}
@@ -109,7 +109,7 @@ public:
 class Buttons : public virtual ZedBoard, public virtual LEDs, public virtual Switches
 {
 private:
-	static int Button_base;
+	int Button_base;
 	int cur_butt;
 	int last_butt;
 	int count;
@@ -161,7 +161,7 @@ int main()
 	ZedMenu myZedMenu;
 	
 	myZedMenu.ChooseOption();
-	while(myZedMenu.Current()!=6) 
+	while(myZedMenu.Current()!=7) 
 	{
 		myZedMenu.Selection();
 		myZedMenu.ChooseOption();
@@ -204,7 +204,9 @@ int isInt(int min, int max, string prompt=" ")
 ZedBoard::ZedBoard()
 {
 	fd = open( "/dev/mem", O_RDWR);
-	*pBase = /*(char*)*/ mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+
+
+	pBase = (char *) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
 			fd, gpio_address);
 
 	if (pBase == MAP_FAILED)
@@ -362,7 +364,7 @@ int Buttons::Read1Butt(int buttNum)
 
 void Buttons::ButtonCommands()
 {	
-
+	cout<<"Button Commands \n";
 	count=ReadAllSwitches();
 	WriteAllLeds(count);
 	while(true)
@@ -373,6 +375,7 @@ void Buttons::ButtonCommands()
 		if (cur_butt!=last_butt)
 		{
 			ButtonSelection();
+			cout<<"buttonsss \n";
 		}	
 		last_butt=cur_butt;
 	}
