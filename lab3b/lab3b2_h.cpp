@@ -71,7 +71,7 @@ int main()
 	ZedMenu myZedMenu;
 	
 	myZedMenu.ChooseOption();
-	while(myZedMenu.Current()!=6) 
+	while(myZedMenu.Current()!=7) 
 	{
 		myZedMenu.Selection();
 		myZedMenu.ChooseOption();
@@ -81,8 +81,9 @@ int main()
 
 
 
+
 /*  Prints a prompt and takes input, returns input when it is int between min and max */
-int isInt(int min, int max, string prompt="")
+int isInt(int min, int max, string prompt=" ")
 {
 	int input=-1;
 	while((input<min) || (input>max))
