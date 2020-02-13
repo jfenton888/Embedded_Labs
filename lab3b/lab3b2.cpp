@@ -5,7 +5,7 @@
 #include <sys/mman.h> 
 #include <string>
 #include <math.h>
-#include <ctime>
+#include <time.h>
 
 //Jack Fenton
 //Northeastern University
@@ -115,7 +115,7 @@ private:
 	int count;
 	int countRate;
 	int countDirection;
-	clock_t time_pass;
+	float time_pass;
 
 public:
 	Buttons(){Button_base = 0x16C, cur_butt=0, last_butt=0, count=0; countRate=0; countDirection=1;}
@@ -364,7 +364,7 @@ int Buttons::Read1Butt(int buttNum)
 
 void Buttons::ButtonCommands()
 {	
-	cout<<"Button Commands \n";
+	cout<<"Starting \n";
 	count=ReadAllSwitches();
 	WriteAllLeds(count);
 	while(true)
@@ -374,8 +374,8 @@ void Buttons::ButtonCommands()
 		usleep(100000);
 		if (cur_butt!=last_butt)
 		{
+			cout<<"Selected "<<cur_butt<<endl;
 			ButtonSelection();
-			cout<<"buttonsss \n";
 		}	
 		last_butt=cur_butt;
 	}
@@ -383,10 +383,11 @@ void Buttons::ButtonCommands()
 
 void Buttons::PushButtonGet()
 {
-	int numPress;
+	int numPress=0;
 	for(int i=0; i<5;i++)
 	{	
 		numPress+=(i+1)*Read1Butt(i);
+		
 	}
 	cur_butt=numPress;
 }
@@ -417,7 +418,9 @@ void Buttons::ButtonSelection()
 			break;
 
 		case 5: //Center Button--Set LEDs to Switches Num	
-			WriteAllLeds(ReadAllSwitches());
+			cout<<"Resetting \n";
+			count=ReadAllSwitches();
+			WriteAllLeds(count);
 			break;
 
 		case 6:
@@ -429,21 +432,21 @@ void Buttons::ButtonSelection()
 
 void Buttons::Counter()
 {
-	time_pass = clock();
 	count=ReadAllSwitches();
 	WriteAllLeds(count);
-	
+	cout << countRate<<endl;
 	while(true)
 	{	
 		//Getting Current Button		
 		PushButtonGet();		
 		usleep(100000);
+		time_pass+=0.1;
 		if (cur_butt!=last_butt)
 		{
 			CounterSpeed();
-			CounterChange();
 		}	
 		last_butt=cur_butt;
+		CounterChange();
 		
 	}
 }
@@ -452,10 +455,11 @@ void Buttons::CounterChange()
 {
 	if (countRate!=0)
 		{
-			if((clock()-time_pass)/CLOCKS_PER_SEC>1/countRate)
+			if((time_pass)>=(float)1/countRate)
 			{ 
+				cout<<"time passed="<<time_pass<<" interval="<<(float)1/countRate<<endl;
 				count+=countDirection;
-				time_pass=clock();
+				time_pass=0;
 			}
 			WriteAllLeds(count);
 		}
@@ -469,18 +473,22 @@ void Buttons::CounterSpeed()
 	{
 		case 1: //Right Button--Counts Up					
 			countDirection=1;
+			cout<<"Count Forward: count="<<count<<" and clock"<<clock()<<" and time "<<time_pass<<" "<<(clock()-time_pass)/CLOCKS_PER_SEC<<" "<<1/countRate<<endl;
 			break;
 
 		case 2: //Left Button--Count Down					
 			countDirection=-1;
+			cout<<"Count Backward \n";
 			break;
 
 		case 3: //Up Button--Increase Count Speed	
 			countRate++;
+			cout<<"Count Faster \n";
 			break;
 
 		case 4: //Down Button--Incriment LEDS -1
 			if (countRate>0) countRate--;
+			cout<<"Count Slower \n";
 			break;
 
 		case 5: //Center Button--Set LEDs to Switches Num	
@@ -539,9 +547,10 @@ void ZedMenu::Selection()
 			//Push Button Control
 			ButtonCommands();
 			break;
-		case 7:
-			CounterSpeed();
 		case 6:
+			Counter();
+			break;
+		case 7:
 			//exit
 			cout << "Exit \n\n";
 			break;
