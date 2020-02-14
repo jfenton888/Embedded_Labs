@@ -532,7 +532,6 @@ void Buttons::CounterChange()
 		{
 			if((time_pass)>=(float)1/countRate)
 			{ 
-				cout<<"time passed="<<time_pass<<" interval="<<(float)1/countRate<<endl;
 				count+=countDirection;
 				time_pass=0;
 			}
@@ -550,7 +549,6 @@ void Buttons::CounterSpeed()
 	{
 		case 1: //Right Button--Counts Up					
 			countDirection=1;
-			cout<<"Count Forward: count="<<count<<" and clock"<<clock()<<" and time "<<time_pass<<" "<<(clock()-time_pass)/CLOCKS_PER_SEC<<" "<<1/countRate<<endl;
 			break;
 
 		case 2: //Left Button--Count Down					
