@@ -63,7 +63,7 @@ public:
 	void RegisterWrite(int offset, int value);
 	int RegisterRead(int offset);
 
-}; //Methods for ZedBoard on lines 000-000
+}; //Methods for ZedBoard on lines 207-264
 
 
 class LEDs : public virtual ZedBoard
@@ -85,7 +85,7 @@ public:
 	void Display1Led();
 	void DisplayAllLeds();
 
-}; //Methods for LEDs on lines 000-000
+}; //Methods for LEDs on lines 269-348
 
 class Switches : public virtual ZedBoard
 {
@@ -103,7 +103,7 @@ public:
 	void Output1Switch();
 	void OutputAllSwitches();
 
-}; //Methods for Switches on lines 000-000
+}; //Methods for Switches on lines 356-401
 
 
 class Buttons : public virtual ZedBoard, public virtual LEDs, public virtual Switches
@@ -131,7 +131,7 @@ public:
 	void CounterChange();
 	
 
-}; //Methods for Buttons on lines 000-000
+}; //Methods for Buttons on lines 407-579
 
 
 class ZedMenu : private virtual LEDs, private virtual Switches, private Buttons
@@ -149,7 +149,7 @@ public:
 	void Selection();
 	
 
-}; //Methods for ZedMenu on lines 000-000
+}; //Methods for ZedMenu on lines 582-635
 
 
 /*  ***** Initialize Non-Class Functions ***** */

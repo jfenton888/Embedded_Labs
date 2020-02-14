@@ -72,32 +72,7 @@ int main()
 	// Initialize
 	int fd;
 	char *pBase;
-//	pBase=Initialize(&fd);
-	
-/*
-char *Initialize(int *fd)
-{
-	*fd = open( "/dev/mem", O_RDWR);
-	return (char *) mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-			*fd, gpio_address);
-} 
-
-
-	int fd;
-	char *pBase;
-*/
-	fd = open( "/dev/mem", O_RDWR);
-	pBase = (char *)  mmap(NULL, gpio_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-			fd, gpio_address);
-	
-
-
-
-
-
-
-
-
+	pBase=Initialize(&fd);
 	int cur_case;
 	int numIn, stateIn, stateOut,numOut;
 
