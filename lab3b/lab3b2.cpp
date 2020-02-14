@@ -266,7 +266,8 @@ int ZedBoard::RegisterRead(int offset)
 
 
 
-/* Changes the state of an LED (ON or OFF)
+/* 
+Changes the state of an LED (ON or OFF)
 address of specified LED, n, is based on the 0th LEDs address + (size of LED address)*n
 
  @param ledNum LED number (0 to 7)
@@ -278,7 +279,11 @@ void LEDs::Write1Led(int ledNum, int state)
 	RegisterWrite(ledNum_offset, state);
 }
 
+/*
+Changes all 8 LEDs to reflect an 8 bit number
 
+@param numLEDs base 10 integer that will be represented by LEDs
+*/
 void LEDs::WriteAllLeds(int numLEDs)
 {
 	for (int i=0;i<=7;i++) 
@@ -288,17 +293,25 @@ void LEDs::WriteAllLeds(int numLEDs)
 	}
 }
 
-/* Reads the value of an LED
- * - Uses base address of I/O
- * @param ledNum LED number (0 to 7)
- * @return LED value read
- */
+/* 
+Reads the value of an LED
+- Uses base address of I/O
+@param ledNum LED number (0 to 7)
+@return LED value read
+*/
 int LEDs::Read1Led(int ledNum)
 {
 	int ledNum_offset = LED_base + 4*ledNum;
 	return RegisterRead(ledNum_offset);
 }
 
+/*
+Read the value of the 8 bit number represented by the LEDs
+treats each LED as representing a different bit
+LED 0 represents the 2^0 bit
+
+@returns integer value of number represented
+*/
 int LEDs::ReadAllLeds()
 {
 	int tempInt=0;
@@ -309,6 +322,12 @@ int LEDs::ReadAllLeds()
 	return tempInt; 
 }
 
+
+/*
+Prompts user for an LED to write to and a state
+-isInt() only allows for valid inputs to pass
+Sends information to Write1LED
+*/
 void LEDs::Display1Led()
 {
 	int numIn, stateIn;
@@ -317,6 +336,10 @@ void LEDs::Display1Led()
 	Write1Led(numIn, stateIn);
 }
 
+/*
+Prompts user for number that can be displayed on 8 bits
+Sends user input to WriteAllLEDs()
+*/
 void LEDs::DisplayAllLeds()
 {
 	int numIn;
@@ -330,17 +353,26 @@ void LEDs::DisplayAllLeds()
 
 
 
-/* Reads the value of a switch
- * - Uses base address of I/O
- * @param switchNum Switch number (0 to 7)
- * @return Switch value read
- */
+/* 
+Reads the value of a switch
+- Uses base address of I/O
+@param switchNum Switch number (0 to 7)
+@return Switch value read
+*/
 int Switches::Read1Switch(int switchNum)
 {
 	int switchNum_offset = Switch_base + 4*switchNum;
 	return RegisterRead(switchNum_offset);
 }
 
+
+/*
+Read the value of the 8 bit number represented by the Switches
+treats each switch as representing a different bit
+switch 0 represents the 2^0 bit
+
+@returns integer value of number represented
+*/
 int Switches::ReadAllSwitches()
 {
 	int tempInt=0;
@@ -351,6 +383,8 @@ int Switches::ReadAllSwitches()
 	return tempInt;
 }
 
+
+
 void Switches::Output1Switch()
 {
 	int numIn, stateOut;
@@ -358,6 +392,8 @@ void Switches::Output1Switch()
 	stateOut=Read1Switch(numIn);
 	cout<<"The state of Switch "<<numIn<<" is "<<stateOut<<endl;
 }
+
+
 
 void Switches::OutputAllSwitches()
 {
@@ -368,14 +404,37 @@ void Switches::OutputAllSwitches()
 
 
 
-
+/* 
+Reads the value of an button
+- Uses base address of I/O
+@param buttNum Button number (0 to 5)
+@return Button value read
+*/
 int Buttons::Read1Butt(int buttNum)
 {
 	int buttNum_offset = Button_base + 4*buttNum;
 	return RegisterRead(buttNum_offset);
 }
 
+/*
+Checks all 5 buttons and sets cur_butt to the number that is being pushed
+If multiple buttons pushed, their sum will be returns
+*/
+void Buttons::PushButtonGet()
+{
+	int numPress=0;
+	for(int i=0; i<5;i++)
+	{	
+		numPress+=(i+1)*Read1Butt(i);
+		
+	}
+	cur_butt=numPress;
+}
 
+/*
+Constantly checks the buttons being pressed
+If the button is different than it was before, takes corresponding action
+*/
 void Buttons::ButtonCommands()
 {	
 	cout<<"Starting \n";
@@ -395,17 +454,10 @@ void Buttons::ButtonCommands()
 	}
 }
 
-void Buttons::PushButtonGet()
-{
-	int numPress=0;
-	for(int i=0; i<5;i++)
-	{	
-		numPress+=(i+1)*Read1Butt(i);
-		
-	}
-	cur_butt=numPress;
-}
 
+/*
+All possible actions that can be taken based on buttons pressed
+*/
 void Buttons::ButtonSelection()
 {
 	switch(cur_butt)
@@ -443,7 +495,12 @@ void Buttons::ButtonSelection()
 	}
 }
 
-
+/*
+Main Function for displaying the changing count on LEDs
+-Checks for buttons being pressed
+-If different than last check, makes an update based on counterspeed
+-Chounter Change checks if enough time has passed to change display
+*/
 void Buttons::Counter()
 {
 	count=ReadAllSwitches();
@@ -465,6 +522,10 @@ void Buttons::Counter()
 	}
 }
 
+/* 
+Increases the count represented on the LEDs
+determines when to increase based on time since last increase
+*/
 void Buttons::CounterChange()
 {
 	if (countRate!=0)
@@ -480,7 +541,9 @@ void Buttons::CounterChange()
 
 }
 
-
+/*
+All possible actions that can be taken based on buttons pressed
+*/
 void Buttons::CounterSpeed()
 {
 	switch(cur_butt)
