@@ -7,11 +7,11 @@
 #include <math.h>
 #include <time.h>
 
-//Jack Fenton
+//Jack Fenton and Nicholas Abadir
 //Northeastern University
 //EECE2150 Embedded Design
 //Lab 3b Object Oriented
-//6 February 2020
+//13 February 2020
 
 
 using namespace std;
@@ -70,7 +70,7 @@ class LEDs : public virtual ZedBoard
 {
 
 private:
-	int LED_base;
+	int LED_base; //offset of the first led, set in constructor 
 
 public:
 	LEDs(){LED_base = 0x12C;}
@@ -91,7 +91,7 @@ class Switches : public virtual ZedBoard
 {
 
 private:
-	int Switch_base;
+	int Switch_base; //offset of the first switch, set in constructor
 
 public:
 	Switches(){Switch_base = 0x14C;}
@@ -109,13 +109,14 @@ public:
 class Buttons : public virtual ZedBoard, public virtual LEDs, public virtual Switches
 {
 private:
-	int Button_base;
-	int cur_butt;
-	int last_butt;
-	int count;
-	int countRate;
-	int countDirection;
-	float time_pass;
+	int Button_base; //offset of the first button, set in constructor
+
+	int cur_butt; //current button reading
+	int last_butt; //previous button reading
+	int count; //current number for display
+	int countRate; //number of times count increases per second
+	int countDirection; //1 or -1, gives positive or negative direction
+	float time_pass; //in seconds, time since last LED update
 
 public:
 	Buttons(){Button_base = 0x16C, cur_butt=0, last_butt=0, count=0; countRate=0; countDirection=1;}
@@ -136,7 +137,7 @@ public:
 class ZedMenu : private virtual LEDs, private virtual Switches, private Buttons
 {
 private:
-	int cur_case;
+	int cur_case; //current user choice from the menu, 1-7
 
 public:
 	ZedMenu(){cur_case=0;}
@@ -152,9 +153,13 @@ public:
 
 
 /*  ***** Initialize Non-Class Functions ***** */
+
 int isInt (int min, int max, string prompt);
 
 
+
+
+/* ************************************* */
 /* ***** MAIN FUNCTION FOR PROGRAM ***** */
 int main()
 {
@@ -170,7 +175,15 @@ int main()
 
 
 
-/*  Prints a prompt and takes input, returns input when it is int between min and max */
+
+
+/*  
+Prints a prompt and takes input, returns input when it is int between min and max 
+
+@param min Minimum value the function will allow the user to give
+@param max Maximum value the function will allow the user to give
+@param prompt optional-reprints this message every time user gives invalid input
+*/
 int isInt(int min, int max, string prompt=" ")
 {
 	int input=-1;
@@ -192,14 +205,12 @@ int isInt(int min, int max, string prompt=" ")
 
 
 /*
-   Initialize general-purpose I/O
- * - Opens access to physical memory /dev/mem
- * - Maps memory at offset 'gpio_address' into virtual address space
- *
- * @param fd File descriptor passed by reference, where the result
- * of function 'open' will be stored.
- * @return Address to virtual memory which is mapped to physical,
- * or MAP_FAILED on error.
+ Initialize general-purpose I/O
+ - Opens access to physical memory /dev/mem
+ - Maps memory at offset 'gpio_address' into virtual address space
+ 
+ fd File descriptor where the result of function 'open' will be stored.
+ pBase set to virtual memory which is mapped to physical, or MAP_FAILED on error.
  */
 ZedBoard::ZedBoard()
 {
@@ -217,10 +228,10 @@ ZedBoard::ZedBoard()
 }
 
 /*
- * Close general-purpose I/O.
- *
- * @param pBase Virtual address where I/O was mapped.
- * @param fd File descriptor previously returned by 'open'.
+ Close general-purpose I/O.
+ 
+ pBase Virtual address where I/O was mapped
+ *fd File descriptor previously returned by 'open'
  */
 ZedBoard::~ZedBoard()
 {
@@ -229,11 +240,11 @@ ZedBoard::~ZedBoard()
 }
 
 /*
- * Write a 4-byte value at the specified general-purpose I/O location.
- * 
- * @param pBase Base address returned by 'mmap'.
- * @parem offset Offset where device is mapped.
- * @param value Value to be written.
+Write a 4-byte value at the specified general-purpose I/O location.
+
+ pBase Base address returned by 'mmap'.
+ @parem offset Offset where device is mapped.
+ @param value Value to be written.
  */ 
 void ZedBoard::RegisterWrite(int offset, int value)
 {
@@ -241,11 +252,11 @@ void ZedBoard::RegisterWrite(int offset, int value)
 } 
 
 /*
- * Read a 4-byte value from the specified general-purpose I/O location.
- * 
- * @param pBase Base address returned by 'mmap'.
- * @param offset Offset where device is mapped.
- * @return Value read.
+ Read a 4-byte value from the specified general-purpose I/O location.
+ 
+ pBase Base address returned by 'mmap'.
+ @param offset Offset where device is mapped.
+ @return Value read.
  */
 int ZedBoard::RegisterRead(int offset)
 {
@@ -256,14 +267,17 @@ int ZedBoard::RegisterRead(int offset)
 
 
 /* Changes the state of an LED (ON or OFF)
- * @param ledNum LED number (0 to 7)
- * @param state State to change to (ON or OFF)
+address of specified LED, n, is based on the 0th LEDs address + (size of LED address)*n
+
+ @param ledNum LED number (0 to 7)
+ @param state State to change to (ON or OFF)
  */
 void LEDs::Write1Led(int ledNum, int state)
 {
 	int ledNum_offset = LED_base + 4*ledNum;
 	RegisterWrite(ledNum_offset, state);
 }
+
 
 void LEDs::WriteAllLeds(int numLEDs)
 {
@@ -556,5 +570,6 @@ void ZedMenu::Selection()
 			break;
 	}
 }
+
 
 
