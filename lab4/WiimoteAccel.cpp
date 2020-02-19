@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
+#include <math.h>
 
 WiimoteAccel::WiimoteAccel()
 {
@@ -46,7 +47,13 @@ void WiimoteAccel::Listen()
 
 void WiimoteAccel::AccelerationEvent(int code, int acceleration)
 {
-	std::cout << "Code = " << code << ", acceleration = " << acceleration << '\n';
+	if (acceleration >  100) acceleration=100;
+	if (acceleration < -100) acceleration=-100;
+	acceleration+=100;
+	acceleration/=25;
+
+	WriteAllLeds(pow(2,acceleration)-1);
+	
 }
 
 
