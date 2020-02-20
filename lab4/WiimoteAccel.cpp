@@ -49,8 +49,8 @@ void WiimoteAccel::AccelerationEvent(int code, int acceleration)
 {
 	if (acceleration >  100) acceleration=100;
 	if (acceleration < -100) acceleration=-100;
-	acceleration+=100;
-	acceleration/=25;
+	acceleration=abs(acceleration);
+	acceleration/=12;
 
 	WriteAllLeds(pow(2,acceleration)-1);
 	
