@@ -46,3 +46,4 @@ void GPIO::GeneratePWM(int period, int pulse, int num_periods)
 		usleep(period - pulse);
 
 	}
+}

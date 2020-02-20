@@ -47,13 +47,6 @@ void WiimoteAccel::Listen()
 
 void WiimoteAccel::AccelerationEvent(int code, int acceleration)
 {
-	if (acceleration >  100) acceleration=100;
-	if (acceleration < -100) acceleration=-100;
-	acceleration=abs(acceleration);
-	acceleration/=12;
-
-	WriteAllLeds(pow(2,acceleration)-1);
-	
+	std::cout << "Code = " << code << ", acceleration = " << acceleration << '\n';
 }
-
 

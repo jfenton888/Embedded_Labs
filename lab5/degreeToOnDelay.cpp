@@ -1,4 +1,6 @@
 foat degreeToOnDelay(float degree)
 {
-	return (degree*100)+600
+	if(degree<10)degree=10;
+	if(degree>170)degree=170;
+	return (degree*10)+600
 }
