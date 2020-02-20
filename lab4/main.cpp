@@ -12,10 +12,10 @@ using namespace std;
 class WiimoteToLed : public WiimoteAccel
 {
 	private:
-		ZedBoard *zed_board; 
+		ZedBoard *zed_board_p; 
 
 	public:
-		WiimoteToLed(ZedBoard *zb){zed_board=zb;}
+		WiimoteToLed(ZedBoard *zb){zed_board_p=zb;}
 		void AccelerationEvent(int code, int acceleration)
 		{
 			if(code==3)
@@ -25,7 +25,7 @@ class WiimoteToLed : public WiimoteAccel
 				acceleration=abs(acceleration);
 				acceleration/=12;
 
-				zed_board->WriteAllLeds(pow(2,acceleration)-1);
+				zed_board_p->WriteAllLeds(pow(2,acceleration)-1);
 			}		
 		}
 };
@@ -40,7 +40,7 @@ int main()
 	// Instantiate ZedBoard object statically
 	ZedBoard zed_board;
 	
-	zed_board.WriteAllLeds(15);
+//	zed_board.WriteAllLeds(15);
 	// Instantiate WiimoteToLed object statically, passing a pointer to the
 	// recently created ZedBoard object.
 	WiimoteToLed wiimote_to_led(&zed_board);

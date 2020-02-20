@@ -1,7 +1,13 @@
-
+#include <iostream>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h> 
+#include <string>
+#include <math.h>
 #include "ZedBoard.h"
 
-
+using namespace std;
 
 /*
    Initialize general-purpose I/O
@@ -15,6 +21,9 @@
  */
 ZedBoard::ZedBoard()
 {
+	gpio_address = 0x400d0000; 
+	gpio_size = 0xff;
+
 	fd = open( "/dev/mem", O_RDWR);
 	LED_base = 0x12C;
 
