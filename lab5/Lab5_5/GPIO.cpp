@@ -47,3 +47,53 @@ void GPIO::GeneratePWM(int period, int pulse, int num_periods)
 
 	}
 }
+
+
+
+void GPIO::GenerateVariablePWM(int period, int first_pulse, int last_pulse, int num_periods)
+{
+	int change_pulse = last_pulse-first_pulse;
+	int delt_pulse = change_pulse/(period*num_periods);
+	int c_pulse=first_pulse;	
+
+	for (int i = 0; i < 20000; i++)
+        {
+                write(fd, "1", 1);
+                usleep(first_pulse);
+                
+		write(fd, "0", 1);
+                usleep(period - first_pulse);
+        }
+
+	
+
+	for (int i = 0; i < num_periods; i++)
+        {		
+                write(fd, "1", 1);
+                usleep(c_pulse);
+                
+		write(fd, "0", 1);
+                usleep(period - c_pulse);
+
+		c_pulse+=delt_pulse;
+
+        }
+	
+
+	
+	for (int i = 0; i < 20000; i++)
+        {
+                write(fd, "1", 1);
+                usleep(last_pulse);
+                
+		write(fd, "0", 1);
+                usleep(period - last_pulse);
+        }
+
+
+
+
+}
+
+
+

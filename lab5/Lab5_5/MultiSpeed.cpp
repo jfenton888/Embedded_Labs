@@ -11,47 +11,60 @@ float degreeToOnDelay(float degree);
 
 int main()
 {
-	int c_case;
-	int angle;
-	int delay;
+	int c_case=0;
+	int stAngle, enAngle, chAngle;
+	int stDelay, enDelay;
+	int speed, time, periods;
 
 	GPIO Base(13);
 	GPIO Bicep(10);
 	GPIO Elbow(11);
 	GPIO Wrist(12);
 	GPIO Gripper(0);
-	while(true)
+	while(c_case!=6)
 	{
-		c_case=isInt(1,5, "Select a Servo \n1:Base\n2:Bicep\n3:Elbow\n4:Wrist\n5:Gripper\n");
-		angle=isInt(0,180, "Pick an angle 0-180: ");
-		delay=degreeToOnDelay(angle);
+		c_case=isInt(1,6, "Select a Servo \n1:Base\n2:Bicep\n3:Elbow\n4:Wrist\n5:Gripper\n6:Quit Program\n");
+		if (c_case==6) break;
+		stAngle=isInt(0,180, "Pick a starting angle 0-180: ");
 
+		enAngle=isInt(0,180, "Pick an ending angle 0-180: ");
+		
+		speed=isInt(0,180, "Pick a speed deg/s: ");
+
+		chAngle=enAngle-stAngle;
+
+		time=chAngle/speed;
+		periods=5*time;	
+		
+	 	cout<<"time:"<<time<<" periods:"<<periods;	
+		stDelay=degreeToOnDelay(stAngle);
+		enDelay=degreeToOnDelay(enAngle);
 
 		switch(c_case)
 		{
 			case 1:
 				//Change angle of Base				
-				Base.GeneratePWM(20000,delay,200);
+				Base.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
 
 			case 2:
 				//Change angle of Bicep				
-				Bicep.GeneratePWM(20000,delay,200);
+				Bicep.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
 
 			case 3:
 				//Change angle of Elbow				
-				Elbow.GeneratePWM(20000,delay,200);
+				Elbow.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
 
 			case 4:
 				//Change angle of Wrist				
-				Wrist.GeneratePWM(20000,delay,200);
+				Wrist.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
 
 			case 5:
 				//Change angle of Gripper				
-				Gripper.GeneratePWM(20000,delay,200);
+				Gripper.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
 		}
 
@@ -84,3 +97,6 @@ float degreeToOnDelay(float degree)
 	if(degree>170)degree=170;
 	return (degree*10)+600;
 }
+
+
+
