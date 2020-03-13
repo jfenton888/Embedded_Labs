@@ -53,12 +53,9 @@ void GPIO::GeneratePWM(int period, int pulse, int num_periods)
 
 void GPIO::GenerateVariablePWM(int period, int first_pulse, int last_pulse, int num_periods)
 {
-	cout<<"In Funct \n";
 	int change_pulse = last_pulse-first_pulse;
 	float delt_pulse = float(change_pulse)/float(num_periods);
 	float  c_pulse=first_pulse;	
-
-	cout<<"change_pulse:"<<change_pulse<<" delt_pulse:"<<delt_pulse<<" c_pulse:"<<c_pulse<<endl;
 
 	for (int i = 0; i < 50; i++)
         {
@@ -68,8 +65,6 @@ void GPIO::GenerateVariablePWM(int period, int first_pulse, int last_pulse, int 
 		write(fd, "0", 1);
                 usleep(period - first_pulse);
         }
-
-	cout<<"At Initial \n";	
 
 	for (int i = 0; i < num_periods; i++)
         {		
@@ -81,10 +76,7 @@ void GPIO::GenerateVariablePWM(int period, int first_pulse, int last_pulse, int 
 
 		c_pulse+=delt_pulse;
 
-        }
-	
-	cout<<"Done Moving \n";
-	
+        }	
 	
 	for (int i = 0; i < 50; i++)
         {
@@ -94,10 +86,6 @@ void GPIO::GenerateVariablePWM(int period, int first_pulse, int last_pulse, int 
 		write(fd, "0", 1);
                 usleep(period - last_pulse);
         }
-
-	cout<<"Finishedi \n";
-
-
 }
 
 

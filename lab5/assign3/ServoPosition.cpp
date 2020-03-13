@@ -27,37 +27,30 @@ int main()
 		angle=isInt(0,180, "Pick an angle 0-180: ");
 		delay=degreeToOnDelay(angle);
 
-
 		switch(c_case)
 		{
 			case 1:
 				//Change angle of Base				
 				Base.GeneratePWM(20000,delay,200);
 				break;
-
 			case 2:
 				//Change angle of Bicep				
 				Bicep.GeneratePWM(20000,delay,200);
 				break;
-
 			case 3:
 				//Change angle of Elbow				
 				Elbow.GeneratePWM(20000,delay,200);
 				break;
-
 			case 4:
 				//Change angle of Wrist				
 				Wrist.GeneratePWM(20000,delay,200);
 				break;
-
 			case 5:
 				//Change angle of Gripper				
 				Gripper.GeneratePWM(20000,delay,200);
 				break;
 		}
-
 	}
-
 }
 
 

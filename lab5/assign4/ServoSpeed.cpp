@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 int isInt(int min, int max, string prompt);
 float degreeToOnDelay(float degree);
 
@@ -25,8 +24,8 @@ int main()
 	{
 		c_case=isInt(1,6, "Select a Servo \n1:Base\n2:Bicep\n3:Elbow\n4:Wrist\n5:Gripper\n6:Quit Program\n");
 		if (c_case==6) break;
+		
 		stAngle=isInt(0,180, "Pick a starting angle 0-180: ");
-
 		enAngle=isInt(0,180, "Pick an ending angle 0-180: ");
 		
 		speed=isInt(0,180, "Pick a speed deg/s: ");
@@ -35,13 +34,9 @@ int main()
 
 		time=chAngle/speed;
 		periods=50*time;	
-		
-			
-	 	cout<<"time:"<<time<<" periods:"<<periods<<endl;	
+					
 		stDelay=degreeToOnDelay(stAngle);
 		enDelay=degreeToOnDelay(enAngle);
-		
-		
 		
 		switch(c_case)
 		{
@@ -49,32 +44,25 @@ int main()
 				//Change angle of Base				
 				Base.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
-
 			case 2:
 				//Change angle of Bicep				
 				Bicep.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
-
 			case 3:
 				//Change angle of Elbow				
 				Elbow.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
-
 			case 4:
 				//Change angle of Wrist				
 				Wrist.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
-
 			case 5:
 				//Change angle of Gripper				
 				Gripper.GenerateVariablePWM(20000,stDelay,enDelay,periods);
 				break;
 		}
-
 	}
-
 }
-
 
 int isInt(int min, int max, string prompt)
 {
@@ -93,13 +81,9 @@ int isInt(int min, int max, string prompt)
 	return input;
 }
 
-
 float degreeToOnDelay(float degree)
 {
 	if(degree<10)degree=10;
 	if(degree>170)degree=170;
 	return (degree*10)+600;
 }
-
-
-
