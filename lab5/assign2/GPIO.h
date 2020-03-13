@@ -36,7 +36,6 @@ public:
 	 */
 	void GeneratePWM(int period, int pulse, int num_periods);
 
-	void GenerateVariablePWM(int period, int first_pulse, int last_pulse, int num_periods);
 };
 
 #endif

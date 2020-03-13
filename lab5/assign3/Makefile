@@ -1,7 +1,7 @@
 CLFAGS = -g -Wall
 CC = g++
 
-PROJECT = MultiSpeed
+PROJECT = ServoPosition
 
 REF1 = GPIO
 

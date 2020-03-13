@@ -31,15 +31,18 @@ int main()
 		
 		speed=isInt(0,180, "Pick a speed deg/s: ");
 
-		chAngle=enAngle-stAngle;
+		chAngle=abs(enAngle-stAngle);
 
 		time=chAngle/speed;
-		periods=5*time;	
+		periods=50*time;	
 		
-	 	cout<<"time:"<<time<<" periods:"<<periods;	
+			
+	 	cout<<"time:"<<time<<" periods:"<<periods<<endl;	
 		stDelay=degreeToOnDelay(stAngle);
 		enDelay=degreeToOnDelay(enAngle);
-
+		
+		
+		
 		switch(c_case)
 		{
 			case 1:
